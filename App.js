@@ -7,12 +7,14 @@ import {
   TouchableOpacity,
   View,
   SafeAreaView,
+  Keyboard
 } from "react-native";
 import api from "./src/services/api";
 
 export default function App() {
   const [cep, setCep] = useState("");
   const inputRef= useRef(null)
+  const [userCep,setUserCep]= useState("")
 
   
   async function search(){
@@ -23,11 +25,15 @@ export default function App() {
       return
     }
 
-  
+  try {
     const response = await api.get(`${cep}/json/`)
-    
+    setUserCep(response)
     console.log(response.data)
-  
+    Keyboard.dismiss()
+  } catch (error) {
+    console.log(error)
+  }
+   
    
   
   }
@@ -61,13 +67,16 @@ export default function App() {
           <Text style={[styles.btnText]}>Apagar</Text>
         </TouchableOpacity>
       </View>
-      <View style={styles.results}>
-      <Text style={styles.itemResults}>Cep:923948</Text>
-      <Text style={styles.itemResults}>logradouro:923948</Text>
-      <Text style={styles.itemResults}>bairro:rio jordao</Text>
-      <Text style={styles.itemResults}>cidade:923948</Text>
-      <Text style={styles.itemResults}>estado:pe</Text>
-      </View>
+      {userCep &&
+        <View style={styles.results}>
+        <Text style={styles.itemResults}>Cep:{userCep.data.cep}</Text>
+        <Text style={styles.itemResults}>logradouro:{userCep.data.logradouro}</Text>
+        <Text style={styles.itemResults}>bairro:{userCep.data.bairro}</Text>
+        <Text style={styles.itemResults}>cidade:{userCep.data.localidade}</Text>
+        <Text style={styles.itemResults}>estado:{userCep.data.uf}</Text>
+        </View>
+      }
+      
     </SafeAreaView>
   );
 }
